@@ -1,8 +1,7 @@
 package kz.amangeldy.currency
 
-data class CurrencyResponse(
+data class RatesResponse(
     val base: String,
-    val date: String,
     val rates: Map<String, Float>
 )
 

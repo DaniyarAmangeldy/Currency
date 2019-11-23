@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+
+    <ImageView
+        android:id="@+id/country_flag"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:contentDescription="United States Dollars"
+        tools:src="@android:drawable/alert_dark_frame" />
+
+    <TextView
+        android:id="@+id/rate_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textColor="#191C1F"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/country_flag"
+        app:layout_constraintTop_toTopOf="@id/country_flag"
+        tools:text="USD" />
+
+    <TextView
+        android:id="@+id/rate_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textColor="#8B959E"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/country_flag"
+        app:layout_constraintStart_toEndOf="@id/country_flag"
+        tools:text="United States Dollar" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/text_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="right"
+        app:constraint_referenced_ids="rate_title,rate_subtitle" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/rate_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:textColor="#191C1F"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintWidth_default="wrap"
+        app:layout_constraintBottom_toBottomOf="@id/country_flag"
+        app:layout_constraintStart_toStartOf="@id/text_barrier"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/country_flag"
+        tools:text="1183.6" />
+
+<!--    android:inputType="number"-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
