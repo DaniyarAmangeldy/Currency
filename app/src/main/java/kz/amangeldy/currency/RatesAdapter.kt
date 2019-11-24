@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_rate.view.*
 
 class RatesAdapter(
-    private val onClickListener: (view: View, item: Rate) -> Unit,
-    private val onCurrencyValueChangeListener: (value: String) -> Unit
+    private val onRateFocused: (item: Rate) -> Unit,
+    private val onCurrencyValueChangeListener: (rate: Rate) -> Unit
 ): ListAdapter<Rate, RatesViewHolder>(RateDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RatesViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rate, parent, false)
-        return RatesViewHolder(view, onClickListener, onCurrencyValueChangeListener)
+        return RatesViewHolder(view, onRateFocused, onCurrencyValueChangeListener)
     }
 
     override fun onBindViewHolder(holder: RatesViewHolder, position: Int) {
@@ -27,7 +27,7 @@ class RatesAdapter(
 
     override fun onViewDetachedFromWindow(holder: RatesViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        holder.onUnbind()
+        holder.onDetach()
     }
 }
 
@@ -41,39 +41,57 @@ class RateDiffUtil: DiffUtil.ItemCallback<Rate>() {
 
 class RatesViewHolder(
     private val view: View,
-    private val onClickListener: (view: View, item: Rate) -> Unit,
-    private val onCurrencyValueChangeListener: (value: String) -> Unit
+    private val onRateFocused: (item: Rate) -> Unit,
+    private val onCurrencyValueChangeListener: (rate: Rate) -> Unit
 ): RecyclerView.ViewHolder(view) {
 
-    private val currencyTextWatcher = view.rate_field.doAfterTextChanged { s: Editable? ->
-        val currentValue = s?.toString() ?: return@doAfterTextChanged
-        onCurrencyValueChangeListener.invoke(currentValue)
+    private val titleTextView = view.rate_title
+    private val valueEditText = view.rate_field
+
+    private val currencyTextWatcher = valueEditText.doAfterTextChanged { s: Editable? ->
+        val text = s?.toString() ?: return@doAfterTextChanged
+
+        val currentValue = if (text.isEmpty()) {
+            0.toBigDecimal()
+        } else {
+            text.toBigDecimalOrNull() ?: return@doAfterTextChanged
+        }
+        rate?.let { onCurrencyValueChangeListener.invoke(it.copy(value = currentValue)) }
     }
 
+    private var rate: Rate? = null
+
     fun bind(rate: Rate) {
-        view.rate_title.text = rate.name
-        val rateValue = rate.value.toString()
-        view.rate_field.setText(rateValue, true)
-        if (view.rate_field.hasFocus()) view.rate_field.setSelection(rateValue.length)
-        view.rate_field.setOnTouchListener(null)
-        view.setOnClickListener { onClickListener(view, rate) }
-        view.rate_field.setOnFocusChangeListener { v, hasFocus ->
-            if (!hasFocus) return@setOnFocusChangeListener
-            (v as EditText).setSelection(v.text.length)
+        this.rate = rate
+        titleTextView.text = rate.name
+        val rateValue = rate.value.displayString
+        if (!valueEditText.isFocused) valueEditText.setText(rateValue, true)
+        valueEditText.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {
+                return@setOnFocusChangeListener
+            }
+            if (!(v as EditText).isSelected) {
+                v.setSelection(v.text.length)
+            }
+            v.openKeyboard()
+            onRateFocused.invoke(rate)
+        }
+        view.setOnClickListener {
+            valueEditText.post { it.requestFocus() }
         }
     }
 
-    fun onUnbind() {
-        view.rate_field.removeTextChangedListener(currencyTextWatcher)
-        view.rate_field.onFocusChangeListener = null
-        view.setOnClickListener(null)
+    fun onDetach() {
+        valueEditText.clearFocus()
+        valueEditText.removeTextChangedListener(currencyTextWatcher)
+        valueEditText.onFocusChangeListener = null
     }
 
     private fun EditText.setText(text: String, skipWatcherNotify: Boolean) {
         if (skipWatcherNotify) {
-            view.rate_field.removeTextChangedListener(currencyTextWatcher)
-            view.rate_field.setText(text)
-            view.rate_field.addTextChangedListener(currencyTextWatcher)
+            removeTextChangedListener(currencyTextWatcher)
+            setText(text)
+            addTextChangedListener(currencyTextWatcher)
         }
     }
 }

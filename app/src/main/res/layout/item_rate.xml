@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
     android:padding="16dp">
 
 
@@ -49,6 +50,10 @@
         android:id="@+id/rate_field"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:imeOptions="actionDone"
+        android:maxLength="10"
+        android:hint="0"
         android:textAlignment="textEnd"
         android:textColor="#191C1F"
         app:layout_constraintHorizontal_bias="1.0"
@@ -58,7 +63,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/country_flag"
         tools:text="1183.6" />
-
-<!--    android:inputType="number"-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

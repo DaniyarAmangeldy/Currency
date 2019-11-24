@@ -11,63 +11,73 @@ import kotlin.coroutines.CoroutineContext
 
 class RatesViewModel(
     private val coroutineContextProvider: CoroutineContextProvider,
-    private val fetchRatesUseCase: FetchRatesUseCase,
-    private val setBaseCurrencyUseCase: SetBaseCurrencyUseCase,
-    private val setBaseCurrencyUserValue: SetBaseCurrencyUserValue
+    private val someUseCase: SomeUseCase
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext = coroutineContextProvider.io
 
-    private var fetchRatesJob: Job = startFetchRatesJob()
+    private var periodicFetchRatesJob: Job = getPeriodicFetchJob()
 
-    private var uiIdleStateAwaitJob: Job? = null
+    private var forceFetchRatesJob: Job? = null
+
+    private var delayFetchJob: Job? = null
 
     val ratesLiveData = MutableLiveData<List<Rate>>()
 
-    fun onBaseRateValueChanged(value: String) {
-        launch {
-            value.toFloatOrNull()?.let { setBaseCurrencyUserValue.invoke(it) }
-        }
+    fun onBaseRateChanged(rate: Rate) {
+        stopAllJob()
+        forceFetchRatesJob = getForceFetchJob(rate)
+        delayFetch()
     }
 
     fun onUserInteract() {
-        if (uiIdleStateAwaitJob?.isActive == true) {
-            uiIdleStateAwaitJob?.cancel()
-        }
-        uiIdleStateAwaitJob = startUiIdleStateAwaitJob()
+        delayFetch()
     }
 
-    fun onBaseCurrencyChanged(currency: String) {
-        launch { setBaseCurrencyUseCase.invoke(currency) }
+    private fun getForceFetchJob(rate: Rate? = null): Job {
+        return launch { fetchData(rate) }
     }
 
-    private fun startFetchRatesJob(): Job = launch {
+    private fun getPeriodicFetchJob(): Job = launch {
         while (true) {
-            val data = fetchRatesUseCase.invoke()
-            withContext(coroutineContextProvider.main) {
-                ratesLiveData.value = data
-            }
+            fetchData()
             delay(DELAY_BETWEEN_FETCHES_RATES_MS)
         }
     }
 
-    private fun startUiIdleStateAwaitJob(): Job =
-        launch {
-            if (fetchRatesJob.isActive) {
-                fetchRatesJob.cancel()
-            }
-            delay(DELAY_AFTER_UI_IDLE_STATE_MS)
-            fetchRatesJob = startFetchRatesJob()
+    private suspend fun fetchData(rate: Rate? = null) {
+        val data = someUseCase.invoke(rate)
+        withContext(coroutineContextProvider.main) {
+            ratesLiveData.value = data
         }
+    }
+
+    private fun delayFetch() {
+        if (periodicFetchRatesJob.isActive) {
+            periodicFetchRatesJob.cancel()
+        }
+        if (delayFetchJob?.isActive == true) {
+            delayFetchJob?.cancel()
+        }
+        delayFetchJob = launch {
+            delay(DELAY_AFTER_UI_IDLE_STATE_MS)
+            periodicFetchRatesJob = getPeriodicFetchJob()
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()
-        fetchRatesJob.cancel()
-        uiIdleStateAwaitJob?.cancel()
+        stopAllJob()
+    }
+
+    private fun stopAllJob() {
+        periodicFetchRatesJob.cancel()
+        delayFetchJob?.cancel()
+        forceFetchRatesJob?.cancel()
     }
 
     companion object {
-        private const val DELAY_BETWEEN_FETCHES_RATES_MS = 1000L
+        private const val DELAY_BETWEEN_FETCHES_RATES_MS = 2000L
         private const val DELAY_AFTER_UI_IDLE_STATE_MS = 5000L
     }
 }

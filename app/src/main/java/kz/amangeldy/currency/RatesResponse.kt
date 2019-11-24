@@ -5,3 +5,7 @@ data class RatesResponse(
     val rates: Map<String, Float>
 )
 
+data class RatesModel(
+    val base: String,
+    val rates: List<Rate>
+)

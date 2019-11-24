@@ -2,9 +2,9 @@ package kz.amangeldy.currency
 
 interface CurrencyRepository {
 
-    var baseCurrencyUserValue: Float
+    var fetchedRates: RatesModel
 
-    suspend fun setBaseCurrency(currency: String)
+    var baseRate: Rate
 
-    suspend fun getLatestRates(): RatesResponse
+    suspend fun fetchRates(): RatesModel
 }

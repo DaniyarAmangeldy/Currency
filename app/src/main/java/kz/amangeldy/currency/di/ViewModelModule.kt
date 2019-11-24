@@ -9,9 +9,7 @@ val viewModelModule: Module = module {
     viewModel {
         RatesViewModel(
             coroutineContextProvider = get(),
-            fetchRatesUseCase = get(),
-            setBaseCurrencyUseCase = get(),
-            setBaseCurrencyUserValue = get()
+            someUseCase = get()
         )
     }
 }
