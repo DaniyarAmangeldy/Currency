@@ -9,6 +9,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_rate.view.*
 
 class RatesAdapter(
@@ -33,7 +34,7 @@ class RatesAdapter(
 
 class RateDiffUtil: DiffUtil.ItemCallback<Rate>() {
 
-    override fun areItemsTheSame(oldItem: Rate, newItem: Rate): Boolean = oldItem.name == newItem.name
+    override fun areItemsTheSame(oldItem: Rate, newItem: Rate): Boolean = oldItem.code == newItem.code
 
     override fun areContentsTheSame(oldItem: Rate, newItem: Rate): Boolean = oldItem == newItem
 }
@@ -46,6 +47,8 @@ class RatesViewHolder(
 ): RecyclerView.ViewHolder(view) {
 
     private val titleTextView = view.rate_title
+    private val flagImageView = view.country_flag
+    private val subtitleTextView = view.rate_subtitle
     private val valueEditText = view.rate_field
 
     private val currencyTextWatcher = valueEditText.doAfterTextChanged { s: Editable? ->
@@ -63,8 +66,11 @@ class RatesViewHolder(
 
     fun bind(rate: Rate) {
         this.rate = rate
-        titleTextView.text = rate.name
+        titleTextView.text = rate.code
+        subtitleTextView.text = rate.currencyName
+        rate.iconRes?.let { Glide.with(view).load(it).into(flagImageView) }
         val rateValue = rate.value.displayString
+
         if (!valueEditText.isFocused) valueEditText.setText(rateValue, true)
         valueEditText.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {
@@ -76,15 +82,14 @@ class RatesViewHolder(
             v.openKeyboard()
             onRateFocused.invoke(rate)
         }
-        view.setOnClickListener {
-            valueEditText.post { it.requestFocus() }
-        }
+        view.setOnClickListener { valueEditText.post { it.requestFocus() } }
     }
 
     fun onDetach() {
         valueEditText.clearFocus()
         valueEditText.removeTextChangedListener(currencyTextWatcher)
         valueEditText.onFocusChangeListener = null
+        flagImageView.setImageDrawable(null)
     }
 
     private fun EditText.setText(text: String, skipWatcherNotify: Boolean) {

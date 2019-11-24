@@ -7,12 +7,17 @@ class CurrencyRepositoryImpl(
     private val apiClient: CurrencyApiClient
 ): CurrencyRepository {
 
-    override var baseRate: Rate = Rate(DEFAULT_RATE_NAME, DEFAULT_RATE_VALUE.toBigDecimal())
+    override var baseRate: Rate = Rate(
+        DEFAULT_RATE_NAME,
+        currencyNameMap[DEFAULT_RATE_NAME],
+        currencyCountryFlag[DEFAULT_RATE_NAME],
+        DEFAULT_RATE_VALUE.toBigDecimal()
+    )
 
-    override var fetchedRates: RatesModel = RatesModel(baseRate.name, emptyList())
+    override var fetchedRates: RatesModel = RatesModel(baseRate.code, emptyList())
 
     override suspend fun fetchRates(): RatesModel {
-        fetchedRates = apiClient.getLatestRates(baseRate.name).toRatesModel()
+        fetchedRates = apiClient.getLatestRates(baseRate.code).toRatesModel()
         return fetchedRates
     }
 

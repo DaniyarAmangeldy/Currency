@@ -1,13 +1,16 @@
 package kz.amangeldy.currency
 
+import androidx.annotation.DrawableRes
 import java.math.BigDecimal
 
 data class Rate(
-    val name: String,
+    val code: String,
+    val currencyName: String?,
+    @DrawableRes val iconRes: Int?,
     val value: BigDecimal
 ) {
 
     infix fun convertTo(other: Rate): Rate {
-        return Rate(name, value * other.value)
+        return copy(value = value * other.value)
     }
 }

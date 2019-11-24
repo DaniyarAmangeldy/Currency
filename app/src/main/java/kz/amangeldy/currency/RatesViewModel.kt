@@ -30,10 +30,6 @@ class RatesViewModel(
         delayFetch()
     }
 
-    fun onUserInteract() {
-        delayFetch()
-    }
-
     private fun getForceFetchJob(rate: Rate? = null): Job {
         return launch { fetchData(rate) }
     }
