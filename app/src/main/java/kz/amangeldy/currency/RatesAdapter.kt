@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_rate.view.*
+import kz.amangeldy.currency.model.Rate
+import kz.amangeldy.currency.util.displayString
+import kz.amangeldy.currency.util.openKeyboard
 
 class RatesAdapter(
     private val onRateFocused: (item: Rate) -> Unit,

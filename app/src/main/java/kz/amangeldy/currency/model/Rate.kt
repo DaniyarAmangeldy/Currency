@@ -1,4 +1,4 @@
-package kz.amangeldy.currency
+package kz.amangeldy.currency.model
 
 import androidx.annotation.DrawableRes
 import java.math.BigDecimal

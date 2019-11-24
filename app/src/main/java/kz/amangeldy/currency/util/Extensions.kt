@@ -1,4 +1,4 @@
-package kz.amangeldy.currency
+package kz.amangeldy.currency.util
 
 import android.content.Context
 import android.view.View

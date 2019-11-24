@@ -1,6 +1,12 @@
-package kz.amangeldy.currency
+package kz.amangeldy.currency.data
 
 import android.content.SharedPreferences
+import kz.amangeldy.currency.domain.CurrencyRepository
+import kz.amangeldy.currency.model.Rate
+import kz.amangeldy.currency.model.RatesModel
+import kz.amangeldy.currency.model.currencyCountryFlag
+import kz.amangeldy.currency.model.currencyNameMap
+import kz.amangeldy.currency.util.toRatesModel
 
 class CurrencyRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
@@ -14,7 +20,8 @@ class CurrencyRepositoryImpl(
         DEFAULT_RATE_VALUE.toBigDecimal()
     )
 
-    override var fetchedRates: RatesModel = RatesModel(baseRate.code, emptyList())
+    override var fetchedRates: RatesModel =
+        RatesModel(baseRate.code, emptyList())
 
     override suspend fun fetchRates(): RatesModel {
         fetchedRates = apiClient.getLatestRates(baseRate.code).toRatesModel()

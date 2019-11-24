@@ -1,4 +1,6 @@
-package kz.amangeldy.currency
+package kz.amangeldy.currency.domain
+
+import kz.amangeldy.currency.model.Rate
 
 class SomeUseCase(
     private val repository: CurrencyRepository

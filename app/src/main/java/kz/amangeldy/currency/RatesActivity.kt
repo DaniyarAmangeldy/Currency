@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.SimpleItemAnimator
 import kotlinx.android.synthetic.main.activity_main.*
+import kz.amangeldy.currency.model.Rate
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class RatesActivity : AppCompatActivity() {

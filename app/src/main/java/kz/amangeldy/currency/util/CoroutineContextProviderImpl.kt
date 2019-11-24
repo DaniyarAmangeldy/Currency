@@ -1,4 +1,4 @@
-package kz.amangeldy.currency
+package kz.amangeldy.currency.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext

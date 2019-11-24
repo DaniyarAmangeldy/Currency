@@ -7,6 +7,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kz.amangeldy.currency.domain.SomeUseCase
+import kz.amangeldy.currency.model.Rate
+import kz.amangeldy.currency.util.CoroutineContextProvider
 import kotlin.coroutines.CoroutineContext
 
 class RatesViewModel(

@@ -1,4 +1,6 @@
-package kz.amangeldy.currency
+package kz.amangeldy.currency.model
+
+import kz.amangeldy.currency.R
 
 val currencyNameMap = mapOf(
     "BRL" to "Brazilian Real",
