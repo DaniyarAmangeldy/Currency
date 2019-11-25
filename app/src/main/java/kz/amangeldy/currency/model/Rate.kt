@@ -2,7 +2,6 @@ package kz.amangeldy.currency.model
 
 import androidx.annotation.DrawableRes
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 data class Rate(
     val code: String,
@@ -12,6 +11,6 @@ data class Rate(
 ) {
 
     infix fun convertTo(other: Rate): Rate {
-        return copy(value = (value * other.value).setScale(2, RoundingMode.FLOOR))
+        return copy(value = value * other.value)
     }
 }

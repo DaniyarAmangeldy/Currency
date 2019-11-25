@@ -67,7 +67,7 @@ dependencies {
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_kotlin_version"
     testImplementation ("org.koin:koin-test:$koin_version") { exclude group: 'org.mockito' }
 
-    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_kotlin_version"
+//    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_kotlin_version"
     androidTestImplementation ("io.mockk:mockk-android:1.9.3") { exclude module: 'objenesis' }
     androidTestImplementation 'org.objenesis:objenesis:2.6'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

@@ -18,7 +18,7 @@ import kz.amangeldy.currency.util.openKeyboard
 class RatesAdapter(
     private val onRateFocused: (item: Rate) -> Unit,
     private val onCurrencyValueChangeListener: (rate: Rate) -> Unit
-): ListAdapter<Rate, RatesViewHolder>(RateDiffUtil()) {
+) : ListAdapter<Rate, RatesViewHolder>(RateDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RatesViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rate, parent, false)
@@ -35,9 +35,10 @@ class RatesAdapter(
     }
 }
 
-class RateDiffUtil: DiffUtil.ItemCallback<Rate>() {
+class RateDiffUtil : DiffUtil.ItemCallback<Rate>() {
 
-    override fun areItemsTheSame(oldItem: Rate, newItem: Rate): Boolean = oldItem.code == newItem.code
+    override fun areItemsTheSame(oldItem: Rate, newItem: Rate): Boolean =
+        oldItem.code == newItem.code
 
     override fun areContentsTheSame(oldItem: Rate, newItem: Rate): Boolean = oldItem == newItem
 }
@@ -47,7 +48,7 @@ class RatesViewHolder(
     private val view: View,
     private val onRateFocused: (item: Rate) -> Unit,
     private val onCurrencyValueChangeListener: (rate: Rate) -> Unit
-): RecyclerView.ViewHolder(view) {
+) : RecyclerView.ViewHolder(view) {
 
     private val titleTextView = view.rate_title
     private val flagImageView = view.country_flag
@@ -73,6 +74,7 @@ class RatesViewHolder(
         subtitleTextView.text = rate.currencyName
         rate.iconRes?.let { Glide.with(view).load(it).into(flagImageView) }
         val rateValue = rate.value.displayString
+        view.contentDescription = contentDescriptionText(rate)
 
         if (!valueEditText.isFocused) valueEditText.setText(rateValue, true)
         valueEditText.setOnFocusChangeListener { v, hasFocus ->
@@ -101,5 +103,10 @@ class RatesViewHolder(
             setText(text)
             addTextChangedListener(currencyTextWatcher)
         }
+    }
+
+    private fun contentDescriptionText(rate: Rate): String {
+        val name = rate.currencyName ?: view.context.getString(R.string.currency_code_fmt, rate.code)
+        return "$name ${rate.value.displayString}"
     }
 }

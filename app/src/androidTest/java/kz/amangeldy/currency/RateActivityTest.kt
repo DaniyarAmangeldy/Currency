@@ -6,11 +6,11 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.rule.ActivityTestRule
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kz.amangeldy.currency.model.Rate
 import kz.amangeldy.currency.util.displayString
 import org.hamcrest.core.AllOf.allOf
@@ -36,7 +36,7 @@ class RateActivityTest: KoinTest {
 
     private val testModule = module { viewModel { viewModel } }
 
-    private val eurRate = Rate("EUR", 100.0.toBigDecimal(), null, null)
+    private val eurRate = Rate("EUR", 100.0.toBigDecimal(), "Euro", null)
     private val usdRate = Rate("USD", 80.12.toBigDecimal(), null, null)
 
     @Before
@@ -48,21 +48,25 @@ class RateActivityTest: KoinTest {
 
     @Test
     fun recyclerViewShowViewsCorrectly() {
-        testRule.launchActivity(null)
-        ratesLiveData.postValue(listOf(eurRate, usdRate))
+        launchActivity(rates = listOf(eurRate, usdRate))
 
+        val expectedContentDescriptionForEuro = "${eurRate.currencyName} ${eurRate.value.displayString}"
+        val expectedContentDescriptionForUsd = "currency code: ${usdRate.code} ${usdRate.value.displayString}"
         onView(RecyclerViewMatcher(R.id.rate_list).atPosition(0))
             .check(matches(
                 allOf(
-                    ViewMatchers.isDisplayed(),
+                    isDisplayed(),
+                    withContentDescription(expectedContentDescriptionForEuro),
                     hasDescendant(withText(eurRate.code)),
                     hasDescendant(withText(eurRate.value.displayString))
+
                 )
             ))
         onView(RecyclerViewMatcher(R.id.rate_list).atPosition(1))
             .check(matches(
                 allOf(
-                    ViewMatchers.isDisplayed(),
+                    isDisplayed(),
+                    withContentDescription(expectedContentDescriptionForUsd),
                     hasDescendant(withText(usdRate.code)),
                     hasDescendant(withText(usdRate.value.displayString))
                 )
@@ -71,16 +75,14 @@ class RateActivityTest: KoinTest {
 
     @Test
     fun statusShowsOnlineCorrectly() {
-        testRule.launchActivity(null)
-        hasConnectionLiveData.postValue(true)
+        launchActivity(hasConnection = true)
 
         onView(withText("Online")).check(matches(ViewMatchers.isDisplayed()))
     }
 
     @Test
     fun statusShowsOfflineCorrectly() {
-        testRule.launchActivity(null)
-        hasConnectionLiveData.postValue(false)
+        launchActivity(hasConnection = false)
 
         onView(withText("Offline")).check(matches(ViewMatchers.isDisplayed()))
     }
@@ -91,8 +93,7 @@ class RateActivityTest: KoinTest {
         val baseRate = eurRate
         every { viewModel.onBaseRateChanged(targetRate) } answers { ratesLiveData.postValue(listOf(targetRate, baseRate)) }
 
-        testRule.launchActivity(null)
-        ratesLiveData.postValue(listOf(eurRate, usdRate))
+        launchActivity(rates = listOf(eurRate, usdRate))
         onView(RecyclerViewMatcher(R.id.rate_list).atPosition(1)).perform(click())
 
         onView(RecyclerViewMatcher(R.id.rate_list).atPosition(0))
@@ -108,11 +109,10 @@ class RateActivityTest: KoinTest {
     @Test
     fun enterTextToBaseRateChangesValues() {
         val newBaseRate = eurRate.copy(value = 200.toBigDecimal())
-        val expectedRate = usdRate.copy(value = newBaseRate.value * usdRate.value)
+        val expectedRate = usdRate convertTo newBaseRate
         every { viewModel.onBaseRateChanged(newBaseRate) } answers { ratesLiveData.postValue(listOf(newBaseRate, expectedRate)) }
 
-        testRule.launchActivity(null)
-        ratesLiveData.postValue(listOf(eurRate, usdRate))
+        launchActivity(rates = listOf(eurRate, usdRate))
 
         onView(RecyclerViewMatcher(R.id.rate_list).atPosition(0, R.id.rate_field))
             .perform(replaceText(newBaseRate.value.displayString))
@@ -125,6 +125,22 @@ class RateActivityTest: KoinTest {
                     hasDescendant(withText(expectedRate.value.displayString))
                 )
             ))
+    }
+
+    @Test
+    fun enterEmptyTextShouldChangeRateValueAsZero() {
+        launchActivity(rates = listOf(eurRate, usdRate))
+
+        onView(RecyclerViewMatcher(R.id.rate_list).atPosition(0, R.id.rate_field))
+            .perform(replaceText(""))
+
+        verify { viewModel.onBaseRateChanged(eurRate.copy(value = 0.toBigDecimal())) }
+    }
+
+    private fun launchActivity(rates: List<Rate>? = null, hasConnection: Boolean? = null) {
+        testRule.launchActivity(null)
+        rates?.let { ratesLiveData.postValue(it) }
+        hasConnection?.let { hasConnectionLiveData.postValue(it) }
     }
 
     @After
