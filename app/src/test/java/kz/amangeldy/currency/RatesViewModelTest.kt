@@ -131,11 +131,11 @@ class RatesViewModelTest : KoinTest {
         }
     }
 
-    private fun createRate(code: String, value: BigDecimal) =
-        Rate(code, value, currencyNameMap[code], currencyCountryFlag[code])
-
     @After
     fun cleanUp() {
         stopKoin()
     }
+
+    private fun createRate(code: String, value: BigDecimal) =
+        Rate(code, value, currencyNameMap[code], currencyCountryFlag[code])
 }

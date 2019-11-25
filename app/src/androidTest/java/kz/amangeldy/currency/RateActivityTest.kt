@@ -137,12 +137,6 @@ class RateActivityTest: KoinTest {
         verify { viewModel.onBaseRateChanged(eurRate.copy(value = 0.toBigDecimal())) }
     }
 
-    private fun launchActivity(rates: List<Rate>? = null, hasConnection: Boolean? = null) {
-        testRule.launchActivity(null)
-        rates?.let { ratesLiveData.postValue(it) }
-        hasConnection?.let { hasConnectionLiveData.postValue(it) }
-    }
-
     @Test
     fun enterNegativeTextShouldSkip() {
         launchActivity(rates = listOf(eurRate, usdRate))
@@ -166,5 +160,11 @@ class RateActivityTest: KoinTest {
     @After
     fun cleanUp() {
         unloadKoinModules(testModule)
+    }
+
+    private fun launchActivity(rates: List<Rate>? = null, hasConnection: Boolean? = null) {
+        testRule.launchActivity(null)
+        rates?.let { ratesLiveData.postValue(it) }
+        hasConnection?.let { hasConnectionLiveData.postValue(it) }
     }
 }
