@@ -1,15 +1,15 @@
 package kz.amangeldy.currency
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kz.amangeldy.currency.domain.SomeUseCase
 import kz.amangeldy.currency.model.Rate
 import kz.amangeldy.currency.util.CoroutineContextProvider
+import retrofit2.HttpException
+import java.io.IOException
+import java.net.UnknownHostException
 import kotlin.coroutines.CoroutineContext
 
 class RatesViewModel(
@@ -19,13 +19,19 @@ class RatesViewModel(
 
     override val coroutineContext: CoroutineContext = coroutineContextProvider.io
 
+    val ratesLiveData: LiveData<List<Rate>>
+        get() = ratesLiveDataMutable
+    val hasConnectionLiveData: LiveData<Boolean>
+        get() = hasConnectionLiveDataMutable
+
     private var periodicFetchRatesJob: Job = getPeriodicFetchJob()
 
     private var forceFetchRatesJob: Job? = null
 
     private var delayFetchJob: Job? = null
 
-    val ratesLiveData = MutableLiveData<List<Rate>>()
+    private val ratesLiveDataMutable = MutableLiveData<List<Rate>>()
+    private val hasConnectionLiveDataMutable = MutableLiveData<Boolean>()
 
     fun onBaseRateChanged(rate: Rate) {
         stopAllJob()
@@ -45,9 +51,22 @@ class RatesViewModel(
     }
 
     private suspend fun fetchData(rate: Rate? = null) {
-        val data = someUseCase.invoke(rate)
-        withContext(coroutineContextProvider.main) {
-            ratesLiveData.value = data
+        try {
+            val data = someUseCase.invoke(rate)
+            withContext(coroutineContextProvider.main) {
+                ratesLiveDataMutable.value = data
+                hasConnectionLiveDataMutable.value = true
+            }
+        } catch (e: Throwable) {
+            when (e) {
+                is IOException,
+                is UnknownHostException,
+                is HttpException -> {
+                    hasConnectionLiveDataMutable.postValue(false)
+                    println(e)
+                }
+                else -> throw e
+            }
         }
     }
 

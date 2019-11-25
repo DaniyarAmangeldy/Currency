@@ -17,6 +17,7 @@ class RatesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         ratesViewModel.ratesLiveData.observe(this, Observer { onTextComes(it) })
+        ratesViewModel.hasConnectionLiveData.observe(this, Observer { onConnectionChanged(it) })
         rate_list.adapter = rateAdapter
         (rate_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
@@ -27,5 +28,9 @@ class RatesActivity : AppCompatActivity() {
 
     private fun onTextComes(rates: List<Rate>) {
         rateAdapter.submitList(rates)
+    }
+
+    private fun onConnectionChanged(hasConnection: Boolean) {
+        onlineState.setState(hasConnection)
     }
 }

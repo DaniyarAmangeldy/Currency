@@ -7,13 +7,26 @@
     android:layout_height="match_parent"
     tools:context=".RatesActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appName"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:title="@string/app_name"
+        android:text="@string/app_name"
+        android:padding="16dp"
+        style="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <kz.amangeldy.currency.custom.view.OnlineStateTextView
+        android:id="@+id/onlineState"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        tools:text="Online"
+        tools:textColor="@android:color/holo_green_light"
+        app:layout_constraintBaseline_toBaselineOf="@id/appName"
         app:layout_constraintEnd_toEndOf="parent"
         />
 
@@ -24,7 +37,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toBottomOf="@id/appName"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 
