@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.item_rate.view.*
 import kz.amangeldy.currency.model.Rate
 import kz.amangeldy.currency.util.displayString
 import kz.amangeldy.currency.util.openKeyboard
+import java.math.BigDecimal
 
 class RatesAdapter(
     private val onRateFocused: (item: Rate) -> Unit,
@@ -58,11 +59,7 @@ class RatesViewHolder(
     private val currencyTextWatcher = valueEditText.doAfterTextChanged { s: Editable? ->
         val text = s?.toString() ?: return@doAfterTextChanged
 
-        val currentValue = if (text.isEmpty()) {
-            0.toBigDecimal()
-        } else {
-            text.toBigDecimalOrNull() ?: return@doAfterTextChanged
-        }
+        val currentValue = text.toPositiveBigDecimalOrNull() ?: return@doAfterTextChanged
         rate?.let { onCurrencyValueChangeListener.invoke(it.copy(value = currentValue)) }
     }
 
@@ -108,5 +105,11 @@ class RatesViewHolder(
     private fun contentDescriptionText(rate: Rate): String {
         val name = rate.currencyName ?: view.context.getString(R.string.currency_code_fmt, rate.code)
         return "$name ${rate.value.displayString}"
+    }
+
+    private fun String.toPositiveBigDecimalOrNull(): BigDecimal? {
+        if (isEmpty()) return 0.toBigDecimal()
+        val decimal = toBigDecimalOrNull() ?: return null
+        return if (decimal < 0.toBigDecimal()) null else decimal
     }
 }

@@ -99,7 +99,7 @@ class RateActivityTest: KoinTest {
         onView(RecyclerViewMatcher(R.id.rate_list).atPosition(0))
             .check(matches(
                 allOf(
-                    ViewMatchers.isDisplayed(),
+                    isDisplayed(),
                     hasDescendant(withText(usdRate.code)),
                     hasDescendant(withText(usdRate.value.displayString))
                 )
@@ -141,6 +141,26 @@ class RateActivityTest: KoinTest {
         testRule.launchActivity(null)
         rates?.let { ratesLiveData.postValue(it) }
         hasConnection?.let { hasConnectionLiveData.postValue(it) }
+    }
+
+    @Test
+    fun enterNegativeTextShouldSkip() {
+        launchActivity(rates = listOf(eurRate, usdRate))
+
+        onView(RecyclerViewMatcher(R.id.rate_list).atPosition(0, R.id.rate_field))
+            .perform(replaceText("-1"))
+
+        verify(exactly = 0) { viewModel.onBaseRateChanged(any()) }
+    }
+
+    @Test
+    fun enterInvalidTextShouldSkip() {
+        launchActivity(rates = listOf(eurRate, usdRate))
+
+        onView(RecyclerViewMatcher(R.id.rate_list).atPosition(0, R.id.rate_field))
+            .perform(replaceText("Hello"))
+
+        verify(exactly = 0) { viewModel.onBaseRateChanged(any()) }
     }
 
     @After
