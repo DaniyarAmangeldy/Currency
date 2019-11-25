@@ -3,10 +3,7 @@ package kz.amangeldy.currency
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kz.amangeldy.currency.domain.FetchRatesUseCase
 import kz.amangeldy.currency.model.Rate
 import kz.amangeldy.currency.util.CoroutineContextProvider
@@ -23,12 +20,12 @@ class RatesViewModel(
     override val coroutineContext: CoroutineContext = coroutineContextProvider.io
 
     val ratesLiveData: LiveData<List<Rate>>
-        get() = ratesLiveDataMutable
+        get() = ratesMutableLiveData
     val hasConnectionLiveData: LiveData<Boolean>
-        get() = hasConnectionLiveDataMutable
+        get() = hasConnectionMutableLiveData
 
-    private val ratesLiveDataMutable = MutableLiveData<List<Rate>>()
-    private val hasConnectionLiveDataMutable = MutableLiveData<Boolean>()
+    private val ratesMutableLiveData = MutableLiveData<List<Rate>>()
+    private val hasConnectionMutableLiveData = MutableLiveData<Boolean>()
 
     private var periodicFetchRatesJob: Job = getPeriodicFetchJob()
 
@@ -56,16 +53,16 @@ class RatesViewModel(
     private suspend fun fetchData(rate: Rate? = null) {
         try {
             val data = fetchRatesUseCase.invoke(rate)
-//            withContext(coroutineContextProvider.main) {
-                ratesLiveDataMutable.postValue(data)
-                hasConnectionLiveDataMutable.postValue(true)
-//            }
+            withContext(coroutineContextProvider.main) {
+                ratesMutableLiveData.value = data
+                hasConnectionMutableLiveData.value = true
+            }
         } catch (e: Throwable) {
             when (e) {
                 is IOException,
                 is UnknownHostException,
                 is HttpException -> {
-                    hasConnectionLiveDataMutable.postValue(false)
+                    hasConnectionMutableLiveData.postValue(false)
                     println(e)
                 }
                 else -> throw e
