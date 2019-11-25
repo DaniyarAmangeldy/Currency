@@ -1,8 +1,8 @@
 package kz.amangeldy.currency.di
 
-import kz.amangeldy.currency.domain.SomeUseCase
+import kz.amangeldy.currency.domain.FetchRatesUseCase
 import org.koin.dsl.module
 
 val useCaseModule = module {
-    single { SomeUseCase(repository = get()) }
+    single { FetchRatesUseCase(repository = get()) }
 }

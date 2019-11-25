@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.SimpleItemAnimator
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_rates.*
 import kz.amangeldy.currency.model.Rate
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -15,10 +15,11 @@ class RatesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        ratesViewModel.ratesLiveData.observe(this, Observer { onTextComes(it) })
+        setContentView(R.layout.activity_rates)
+        ratesViewModel.ratesLiveData.observe(this, Observer { updateList(it) })
         ratesViewModel.hasConnectionLiveData.observe(this, Observer { onConnectionChanged(it) })
         rate_list.adapter = rateAdapter
+        // Disable change animations to avoid blink data
         (rate_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
 
@@ -26,7 +27,7 @@ class RatesActivity : AppCompatActivity() {
         ratesViewModel.onBaseRateChanged(item)
     }
 
-    private fun onTextComes(rates: List<Rate>) {
+    private fun updateList(rates: List<Rate>) {
         rateAdapter.submitList(rates)
     }
 

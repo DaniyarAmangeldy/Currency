@@ -3,8 +3,11 @@ package kz.amangeldy.currency
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.*
-import kz.amangeldy.currency.domain.SomeUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kz.amangeldy.currency.domain.FetchRatesUseCase
 import kz.amangeldy.currency.model.Rate
 import kz.amangeldy.currency.util.CoroutineContextProvider
 import retrofit2.HttpException
@@ -14,7 +17,7 @@ import kotlin.coroutines.CoroutineContext
 
 class RatesViewModel(
     private val coroutineContextProvider: CoroutineContextProvider,
-    private val someUseCase: SomeUseCase
+    private val fetchRatesUseCase: FetchRatesUseCase
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext = coroutineContextProvider.io
@@ -24,14 +27,14 @@ class RatesViewModel(
     val hasConnectionLiveData: LiveData<Boolean>
         get() = hasConnectionLiveDataMutable
 
+    private val ratesLiveDataMutable = MutableLiveData<List<Rate>>()
+    private val hasConnectionLiveDataMutable = MutableLiveData<Boolean>()
+
     private var periodicFetchRatesJob: Job = getPeriodicFetchJob()
 
     private var forceFetchRatesJob: Job? = null
 
     private var delayFetchJob: Job? = null
-
-    private val ratesLiveDataMutable = MutableLiveData<List<Rate>>()
-    private val hasConnectionLiveDataMutable = MutableLiveData<Boolean>()
 
     fun onBaseRateChanged(rate: Rate) {
         stopAllJob()
@@ -52,11 +55,11 @@ class RatesViewModel(
 
     private suspend fun fetchData(rate: Rate? = null) {
         try {
-            val data = someUseCase.invoke(rate)
-            withContext(coroutineContextProvider.main) {
-                ratesLiveDataMutable.value = data
-                hasConnectionLiveDataMutable.value = true
-            }
+            val data = fetchRatesUseCase.invoke(rate)
+//            withContext(coroutineContextProvider.main) {
+                ratesLiveDataMutable.postValue(data)
+                hasConnectionLiveDataMutable.postValue(true)
+//            }
         } catch (e: Throwable) {
             when (e) {
                 is IOException,

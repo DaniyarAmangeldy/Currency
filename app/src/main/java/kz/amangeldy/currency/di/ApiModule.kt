@@ -1,5 +1,6 @@
 package kz.amangeldy.currency.di
 
+import kz.amangeldy.currency.BuildConfig
 import kz.amangeldy.currency.data.CurrencyApiClient
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -10,7 +11,7 @@ val apiModule: Module = module {
     single {
         Retrofit
             .Builder()
-            .baseUrl("https://revolut.duckdns.org")
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

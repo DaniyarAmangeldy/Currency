@@ -2,7 +2,7 @@ package kz.amangeldy.currency.domain
 
 import kz.amangeldy.currency.model.Rate
 
-class SomeUseCase(
+class FetchRatesUseCase(
     private val repository: CurrencyRepository
 ) {
 

@@ -10,30 +10,30 @@
 
     <ImageView
         android:id="@+id/country_flag"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="@dimen/size_6x"
+        android:layout_height="@dimen/size_6x"
+        android:importantForAccessibility="no"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@android:drawable/alert_dark_frame" />
+        tools:src="@drawable/united_states_of_america" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/rate_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:textColor="#191C1F"
-        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:layout_marginStart="@dimen/size_2x"
+        android:importantForAccessibility="no"
         app:layout_constraintStart_toEndOf="@id/country_flag"
         app:layout_constraintTop_toTopOf="@id/country_flag"
         tools:text="USD" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/rate_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:textColor="#8B959E"
-        android:textSize="16sp"
+        android:layout_marginStart="@dimen/size_2x"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         app:layout_constraintBottom_toBottomOf="@id/country_flag"
         app:layout_constraintStart_toEndOf="@id/country_flag"
         tools:text="United States Dollar" />
@@ -42,6 +42,7 @@
         android:id="@+id/text_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
         app:barrierDirection="right"
         app:constraint_referenced_ids="rate_title,rate_subtitle" />
 
@@ -49,13 +50,13 @@
         android:id="@+id/rate_field"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="0"
+        android:hint="@string/currency_hint"
         android:imeOptions="actionDone"
         android:inputType="numberDecimal"
+        android:importantForAccessibility="no"
         android:maxLength="10"
         android:textAlignment="textEnd"
-        android:textColor="#191C1F"
-        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="@id/country_flag"
         app:layout_constraintEnd_toEndOf="parent"

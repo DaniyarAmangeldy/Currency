@@ -1,6 +1,5 @@
 package kz.amangeldy.currency.data
 
-import android.content.SharedPreferences
 import kz.amangeldy.currency.domain.CurrencyRepository
 import kz.amangeldy.currency.model.Rate
 import kz.amangeldy.currency.model.RatesModel
@@ -9,15 +8,14 @@ import kz.amangeldy.currency.model.currencyNameMap
 import kz.amangeldy.currency.util.toRatesModel
 
 class CurrencyRepositoryImpl(
-    private val sharedPreferences: SharedPreferences,
     private val apiClient: CurrencyApiClient
 ): CurrencyRepository {
 
     override var baseRate: Rate = Rate(
         DEFAULT_RATE_NAME,
+        DEFAULT_RATE_VALUE.toBigDecimal(),
         currencyNameMap[DEFAULT_RATE_NAME],
-        currencyCountryFlag[DEFAULT_RATE_NAME],
-        DEFAULT_RATE_VALUE.toBigDecimal()
+        currencyCountryFlag[DEFAULT_RATE_NAME]
     )
 
     override var fetchedRates: RatesModel =

@@ -1,10 +1,6 @@
 package kz.amangeldy.currency.util
 
-import kz.amangeldy.currency.model.Rate
-import kz.amangeldy.currency.model.RatesModel
-import kz.amangeldy.currency.model.RatesResponse
-import kz.amangeldy.currency.model.currencyCountryFlag
-import kz.amangeldy.currency.model.currencyNameMap
+import kz.amangeldy.currency.model.*
 
 fun RatesResponse.toRatesModel(): RatesModel {
     return RatesModel(
@@ -12,9 +8,9 @@ fun RatesResponse.toRatesModel(): RatesModel {
         rates.map {
             Rate(
                 it.key,
+                it.value.toBigDecimal(),
                 currencyNameMap[it.key],
-                currencyCountryFlag[it.key],
-                it.value.toBigDecimal()
+                currencyCountryFlag[it.key]
             )
         }
     )
